@@ -65,12 +65,12 @@ namespace Upload
         private void Worker()
         {
 
-            sp.Write("BEGIN_CSV");
+            sp.Write("BEGIN_CSV\r");
             Console.WriteLine("PC: BEGIN_CSV");
             Thread.Sleep(sleepTime);
             string ack = sp.ReadExisting();
             Console.WriteLine("EMB: " + ack);
-            if (ack != "BEGIN") 
+            if (ack != "BEGIN\r") 
             {
                 sp.Close();
                 Console.WriteLine("Invalid target Response to BEGIN_CSV");
@@ -79,12 +79,12 @@ namespace Upload
 
             foreach (string s in csvLines)
             {
-                sp.Write(s);
+                sp.Write(s + "\r");
                 Console.WriteLine("PC: " + s);
                 Thread.Sleep(sleepTime);
                 ack = sp.ReadExisting();
                 Console.WriteLine("EMB: " + ack);
-                if (ack != "ACK")
+                if (ack != "ACK\r")
                 {
                     sp.Close();
                     Console.WriteLine("No ACK or INVALID ACK to line " + s);
@@ -92,12 +92,12 @@ namespace Upload
                 }
             }
 
-            sp.Write("END_CSV");
+            sp.Write("END_CSV\r");
             Console.WriteLine("PC: END_CSV");
             Thread.Sleep(sleepTime);
             ack = sp.ReadExisting();
             Console.WriteLine("EMB: " + ack);
-            if (ack != "END")
+            if (ack != "END\r")
             {
                 sp.Close();
                 Console.WriteLine("Invalid target Response to END_CSV");
