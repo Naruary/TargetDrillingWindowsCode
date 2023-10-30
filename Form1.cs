@@ -60,23 +60,12 @@ namespace Upload
             thread.Start();
         }
 
-        const int sleepTime = 100;
+
 
 
         private void Worker()
         {
-
-            sp.Write("BEGIN_CSV\r");
-            Console.WriteLine("PC: BEGIN_CSV");
-            Thread.Sleep(sleepTime);
-            string ack = sp.ReadExisting();
-            Console.WriteLine("EMB: " + ack);
-            if (ack != "BEGIN\r") 
-            {
-                sp.Close();
-                Console.WriteLine("Invalid target Response to BEGIN_CSV");
-                thread.Abort(); 
-            }
+            SendString("BEGIN_CSV\r", "BEGIN\r");
 
             foreach (string s in csvLines)
             {
@@ -84,30 +73,10 @@ namespace Upload
                 { 
                     continue; 
                 }
-                sp.Write(s + "\r");
-                Console.WriteLine("PC: " + s);
-                Thread.Sleep(sleepTime);
-                ack = sp.ReadExisting();
-                Console.WriteLine("EMB: " + ack);
-                if (ack != "ACK\r")
-                {
-                    sp.Close();
-                    Console.WriteLine("No ACK or INVALID ACK");
-                    thread.Abort();
-                }
+                SendString(s + "\r", "ACK\r");
             }
 
-            sp.Write("END_CSV\r");
-            Console.WriteLine("PC: END_CSV");
-            Thread.Sleep(sleepTime);
-            ack = sp.ReadExisting();
-            Console.WriteLine("EMB: " + ack);
-            if (ack != "END\r")
-            {
-                sp.Close();
-                Console.WriteLine("Invalid target Response to END_CSV");
-                thread.Abort();
-            }
+            SendString("END_CSV\r", "END\r");
 
             sp.Close();
             thread.Abort();
@@ -118,6 +87,34 @@ namespace Upload
             sp.Close();
             thread.Abort();
             btnKillUpload.Enabled = false;
+        }
+
+        private bool SendString (string s, string expected)
+        {
+            int timer = 0;
+            StringBuilder sb = new StringBuilder();
+            sp.Write (s);
+            Console.WriteLine("PC: " + s);
+            const int sleepTime = 10;
+
+            while (timer < 100)
+            {
+                Thread.Sleep(sleepTime);
+                timer += sleepTime;
+                string resp = sp.ReadExisting();
+                sb.Append (resp);
+                if (sb.ToString() == expected)
+                {
+                    Console.WriteLine("EMB: " +  resp);
+                    return true;
+                }
+            }
+
+            sp.Close();
+            Console.WriteLine("Invalid target Response");
+            thread.Abort();
+
+            return false;
         }
     }
 }
