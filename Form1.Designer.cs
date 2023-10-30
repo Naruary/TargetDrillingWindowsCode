@@ -120,7 +120,7 @@
             this.Controls.Add(this.lblFileSelected);
             this.Controls.Add(this.label1);
             this.Name = "Form1";
-            this.Text = "Target Drilliling Upload CSV";
+            this.Text = "Target Drilliling Upload CSV (v0.1)";
             this.ResumeLayout(false);
             this.PerformLayout();
 

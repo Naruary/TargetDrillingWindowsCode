@@ -54,6 +54,7 @@ namespace Upload
             sp.ReadTimeout = 100;
             sp.DiscardInBuffer();
             sp.DiscardOutBuffer();
+            btnKillUpload.Enabled = true;
 
             thread = new Thread(new ThreadStart(Worker));
             thread.Start();
@@ -79,6 +80,10 @@ namespace Upload
 
             foreach (string s in csvLines)
             {
+                if (!s.Contains(","))
+                { 
+                    continue; 
+                }
                 sp.Write(s + "\r");
                 Console.WriteLine("PC: " + s);
                 Thread.Sleep(sleepTime);
@@ -87,7 +92,7 @@ namespace Upload
                 if (ack != "ACK\r")
                 {
                     sp.Close();
-                    Console.WriteLine("No ACK or INVALID ACK to line " + s);
+                    Console.WriteLine("No ACK or INVALID ACK");
                     thread.Abort();
                 }
             }
@@ -112,6 +117,7 @@ namespace Upload
         {
             sp.Close();
             thread.Abort();
+            btnKillUpload.Enabled = false;
         }
     }
 }
