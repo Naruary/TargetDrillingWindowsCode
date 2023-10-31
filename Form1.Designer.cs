@@ -36,11 +36,9 @@
             this.label2 = new System.Windows.Forms.Label();
             this.btnUpload = new System.Windows.Forms.Button();
             this.btnKillUpload = new System.Windows.Forms.Button();
+            this.label3 = new System.Windows.Forms.Label();
+            this.lblStatus = new System.Windows.Forms.Label();
             this.SuspendLayout();
-            // 
-            // openFileDialog1
-            // 
-            this.openFileDialog1.FileName = "openFileDialog1";
             // 
             // label1
             // 
@@ -89,6 +87,7 @@
             // 
             // btnUpload
             // 
+            this.btnUpload.Enabled = false;
             this.btnUpload.Location = new System.Drawing.Point(492, 47);
             this.btnUpload.Name = "btnUpload";
             this.btnUpload.Size = new System.Drawing.Size(75, 23);
@@ -99,6 +98,7 @@
             // 
             // btnKillUpload
             // 
+            this.btnKillUpload.Enabled = false;
             this.btnKillUpload.Location = new System.Drawing.Point(492, 107);
             this.btnKillUpload.Name = "btnKillUpload";
             this.btnKillUpload.Size = new System.Drawing.Size(75, 23);
@@ -107,11 +107,30 @@
             this.btnKillUpload.UseVisualStyleBackColor = true;
             this.btnKillUpload.Click += new System.EventHandler(this.btnKillUpload_Click);
             // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(16, 291);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(40, 13);
+            this.label3.TabIndex = 7;
+            this.label3.Text = "Status:";
+            // 
+            // lblStatus
+            // 
+            this.lblStatus.AutoSize = true;
+            this.lblStatus.Location = new System.Drawing.Point(57, 290);
+            this.lblStatus.Name = "lblStatus";
+            this.lblStatus.Size = new System.Drawing.Size(0, 13);
+            this.lblStatus.TabIndex = 8;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(574, 271);
+            this.ClientSize = new System.Drawing.Size(574, 328);
+            this.Controls.Add(this.lblStatus);
+            this.Controls.Add(this.label3);
             this.Controls.Add(this.btnKillUpload);
             this.Controls.Add(this.btnUpload);
             this.Controls.Add(this.label2);
@@ -120,7 +139,7 @@
             this.Controls.Add(this.lblFileSelected);
             this.Controls.Add(this.label1);
             this.Name = "Form1";
-            this.Text = "Target Drilliling Upload CSV (v0.2)";
+            this.Text = "Target Drilliling Upload CSV (v0.3)";
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -136,6 +155,8 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Button btnUpload;
         private System.Windows.Forms.Button btnKillUpload;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Label lblStatus;
     }
 }
 
