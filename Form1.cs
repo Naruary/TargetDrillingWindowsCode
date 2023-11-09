@@ -6,6 +6,7 @@ using System.IO;
 using System.Text;
 using System.Diagnostics;
 using Upload.Properties;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace Upload
 {
@@ -20,6 +21,14 @@ namespace Upload
             gbSingleLine.Location = gbAll.Location;
             m_Timeout = Properties.Settings.Default.AckTimeout;
             tBoxTimeout.Text = Properties.Settings.Default.AckTimeout.ToString();
+            if (Properties.Settings.Default.MostRecentFile != "")
+            {
+                lblFileSelected.Text = Properties.Settings.Default.MostRecentFile;
+                // read the csv file into strings
+                m_CSVLines = File.ReadAllLines(lblFileSelected.Text);
+                gbAll.Enabled = true;
+                gbSingleLine.Enabled = true;
+            }
         }
 
         string []m_CSVLines;
@@ -63,7 +72,7 @@ namespace Upload
             }
             catch
             {
-                UploadThreadOver("Can't open serial port");
+                GUIUploadThreadOver("Can't open serial port");
                 return;
             }
             sp.ReadTimeout = 100;
@@ -83,11 +92,11 @@ namespace Upload
             gbUploadMethod.Enabled = false;
             m_Timeout = Convert.ToUInt64(tBoxTimeout.Text);
 
-            thread = new Thread(new ThreadStart(Worker));
+            thread = new Thread(new ThreadStart(WorkerUploadAll));
             thread.Start();
         }
 
-        private void UploadThreadOver(string status)
+        private void GUIUploadThreadOver(string status)
         {
             btnUpload.Invoke((MethodInvoker)delegate {
                 // Running on the UI thread
@@ -124,9 +133,14 @@ namespace Upload
             return SendString("END_CSV\r", "END\r", "Error with END_CSV");
         }
 
-        private void Worker()
+        private void WorkerUploadAll()
         {
-            SendBegin();
+            if (!SendBegin())
+            {
+                GUIUploadThreadOver("Upload Failed");
+                thread.Abort();
+                thread = null;
+            }
 
             UInt16 lineNumber = 0;
             foreach (string s in m_CSVLines)
@@ -136,12 +150,22 @@ namespace Upload
                     continue; 
                 }
                 lineNumber++;
-                SendLine(s, lineNumber);
+                if (!SendLine(s, lineNumber))
+                {
+                    GUIUploadThreadOver("Upload Failed");
+                    thread.Abort();
+                    thread = null;
+                }
             }
 
-            SendEnd();
+            if (!SendEnd()) 
+            {
+                GUIUploadThreadOver("Upload Failed");
+                thread.Abort();
+                thread = null;
+            }
 
-            UploadThreadOver("Success Upload");
+            GUIUploadThreadOver("Success Upload");
             thread.Abort();
             thread = null;
         }
@@ -153,7 +177,7 @@ namespace Upload
             {
                 sp.Close();
             }
-            UploadThreadOver("Upload Killed");
+            GUIUploadThreadOver("Upload Killed");
             gbUploadMethod.Enabled = true;
         }
 
@@ -163,7 +187,7 @@ namespace Upload
             StringBuilder sb = new StringBuilder();
             sp.Write (s);
             Console.WriteLine("PC: " + s);
-            const int sleepTime = 10;
+            const int sleepTime = 100;
 
             while (timer < m_Timeout)
             {
@@ -180,13 +204,6 @@ namespace Upload
 
             sp.Close();
             Console.WriteLine("Invalid target Response");
-
-            if (thread != null) 
-            {
-                UploadThreadOver(error);
-                thread.Abort();
-                thread = null;
-            }
 
             return false;
         }
@@ -224,63 +241,53 @@ namespace Upload
             switch (m_SingleLineState) 
             { 
                 case eSingleLineState.BEGIN:
+                    OpenSerialPort();
                     tBoxTimeout.Enabled = false;
                     lblStatus.Text = "Upload in progress...";
                     m_Timeout = Convert.ToUInt64(tBoxTimeout.Text);
-                    OpenSerialPort();
-                    if (!SendBegin())
-                    {
-                        lblStatus.Text = "Upload Failed";
-                        SingleLineTerminated();
-                    }
-                    else
-                    {
-                        btnAbortSingleLine.Enabled = true;
-                        m_SingleLineNumber = 0;
-                        m_SingleLineState = eSingleLineState.SEND_FILE_LINES;
-                    }
+                    thread = new Thread(new ThreadStart(WorkerSendSingle));
+                    thread.Start();
                     break;
 
                 case eSingleLineState.SEND_FILE_LINES:
-                    if (!SendLine(m_CSVLines[m_SingleLineNumber], m_SingleLineNumber))
-                    {
-                        lblStatus.Text = "Upload Failed";
-                        SingleLineTerminated();
-                    }
-                    else
-                    {
-                        m_SingleLineNumber++;
-                        if (m_SingleLineNumber >= m_CSVLines.Length)
-                        {
-                            m_SingleLineState = eSingleLineState.END;
-                        }
-                    }
-                    break;
-
                 case eSingleLineState.END:
-                    if (SendEnd())
-                    {
-                        lblStatus.Text = "Upload Successful";
-                    }
-                    else
-                    {
-                        lblStatus.Text = "Upload Failed";
-                    }
-
-                    SingleLineTerminated();
+                    thread = new Thread(new ThreadStart(WorkerSendSingle));
+                    thread.Start();
                     break;
             }
         }
 
-        void SingleLineTerminated()
+        /// <summary>
+        /// Called at the end of every single line send, whether or not successful
+        /// </summary>
+        /// <param name="status"></param>
+        void SingleLineThreadTerminated(string status)
         {
-            gbUploadMethod.Enabled = true;
-            btnAbortSingleLine.Enabled = false;
-            tBoxTimeout.Enabled = true;
-            m_SingleLineNumber = 0;
-            m_SingleLineState = eSingleLineState.BEGIN;
-            tBoxTimeout.Enabled = true;
-            sp.Close();
+            btnSendSingleLine.Invoke((MethodInvoker)delegate {
+                // Running on the UI thread
+                btnSendSingleLine.Enabled = true;
+            });
+            btnAbortSingleLine.Invoke((MethodInvoker)delegate {
+                // Running on the UI thread
+                btnAbortSingleLine.Enabled = false;
+            });
+            lblStatus.Invoke((MethodInvoker)delegate {
+                // Running on the UI thread
+                lblStatus.Text = status;
+            });
+            gbUploadMethod.Invoke((MethodInvoker)delegate {
+                // Running on the UI thread
+                gbUploadMethod.Enabled = true;
+            });
+            tBoxTimeout.Invoke((MethodInvoker)delegate {
+                // Running on the UI thread
+                tBoxTimeout.Enabled = true;
+            });
+
+
+            thread.Abort();
+            thread = null;
+
         }
 
         /// <summary>
@@ -292,18 +299,77 @@ namespace Upload
         private void btnSendSingleLine_Click(object sender, EventArgs e)
         {
             gbUploadMethod.Enabled = false;
+            btnAbortSingleLine.Enabled = true;
+            btnSendSingleLine.Enabled = false;
             PushSingleLineFromClick();
         }
 
         private void btnAbortSingleLine_Click(object sender, EventArgs e)
         {
-            SingleLineTerminated();
+            SingleLineThreadTerminated("Upload aborted");
+            m_SingleLineState = eSingleLineState.BEGIN;
+            sp.Close();
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
             Properties.Settings.Default.AckTimeout = Convert.ToUInt64(tBoxTimeout.Text);
+            Properties.Settings.Default.MostRecentFile = lblFileSelected.Text;
             Properties.Settings.Default.Save();
+        }
+
+        private void WorkerSendSingle()
+        {
+            bool success = false; 
+            switch (m_SingleLineState)
+            {
+                case eSingleLineState.BEGIN:
+                    success = SendBegin();
+                    if (success)
+                    {
+                        m_SingleLineNumber = 0;
+                        m_SingleLineState = eSingleLineState.SEND_FILE_LINES;
+                        SingleLineThreadTerminated("Begin Successful");
+                    }
+                    break;
+
+                case eSingleLineState.SEND_FILE_LINES:
+                    // Advance past blank lines
+                    while (!m_CSVLines[m_SingleLineNumber].Contains(","))
+                    {
+                        m_SingleLineNumber++;
+                    }
+                    success = SendLine(m_CSVLines[m_SingleLineNumber], m_SingleLineNumber);
+                    if (success)
+                    {
+                        m_SingleLineNumber++;
+                        if (m_SingleLineNumber >= m_CSVLines.Length)
+                        {
+                            m_SingleLineState = eSingleLineState.END;
+                        }
+                        SingleLineThreadTerminated("Single Line Successful");
+                    }
+                    break;
+
+                case eSingleLineState.END:
+                    success = SendEnd();
+                    if (success)
+                    {
+                        sp.Close();
+                        SingleLineThreadTerminated("Upload Successful");
+                    }
+                    break;
+
+            }
+
+            if (!success)
+            {
+                m_SingleLineNumber = 0;
+                m_SingleLineState = eSingleLineState.BEGIN;
+                sp.Close();
+                SingleLineThreadTerminated("Upload Failed");
+            }
+
         }
     }
 }

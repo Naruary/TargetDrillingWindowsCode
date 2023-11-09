@@ -261,7 +261,7 @@
             this.Controls.Add(this.lblFileSelected);
             this.Controls.Add(this.label1);
             this.Name = "Form1";
-            this.Text = "Target Drilliling Upload CSV (v0.4)";
+            this.Text = "Target Drilliling Upload CSV (v0.5)";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.gbUploadMethod.ResumeLayout(false);
             this.gbUploadMethod.PerformLayout();

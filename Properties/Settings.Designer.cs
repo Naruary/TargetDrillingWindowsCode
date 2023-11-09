@@ -46,5 +46,17 @@ namespace Upload.Properties {
                 this["AckTimeout"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string MostRecentFile {
+            get {
+                return ((string)(this["MostRecentFile"]));
+            }
+            set {
+                this["MostRecentFile"] = value;
+            }
+        }
     }
 }
