@@ -31,6 +31,14 @@ namespace Upload
             }
         }
 
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            Properties.Settings.Default.UploadAll = rbAll.Checked;
+            Properties.Settings.Default.AckTimeout = Convert.ToUInt64(tBoxTimeout.Text);
+            Properties.Settings.Default.MostRecentFile = lblFileSelected.Text;
+            Properties.Settings.Default.Save();
+        }
+
         string []m_CSVLines;
         UInt64 m_Timeout;
         private void btnSelectFile_Click(object sender, EventArgs e)
@@ -62,7 +70,13 @@ namespace Upload
             }
         }
 
-        void OpenSerialPort()
+        enum eUploadMethod
+        {
+            ALL,
+            SINGLE_LINE,
+        };
+
+        bool OpenSerialPort(eUploadMethod method)
         {
             string portName = comboBoxSerialPort.SelectedItem.ToString();
             sp = new SerialPort(portName, 57600, Parity.None, 8, StopBits.One);
@@ -72,19 +86,27 @@ namespace Upload
             }
             catch
             {
-                GUIUploadThreadOver("Can't open serial port");
-                return;
+                if (method == eUploadMethod.ALL)
+                {
+                    GUIUploadThreadOver("Can't open serial port");
+                }
+                else
+                {
+                    SingleLineThreadTerminated("Can't open serial port");
+                }
+                return false;
             }
             sp.ReadTimeout = 100;
             sp.DiscardInBuffer();
             sp.DiscardOutBuffer();
+            return true;
         }
 
         SerialPort sp;
         Thread thread;
         private void btnUpload_Click(object sender, EventArgs e)
         {
-            OpenSerialPort();
+            OpenSerialPort(eUploadMethod.ALL);
             btnUpload.Enabled = false;
             btnKillUpload.Enabled = true;
             lblStatus.Text = "Upload in progress...";
@@ -215,8 +237,6 @@ namespace Upload
         /// <param name="e"></param>
         private void rbAll_CheckedChanged(object sender, EventArgs e)
         {
-            Properties.Settings.Default.UploadAll = rbAll.Checked;
-            Properties.Settings.Default.Save();
             gbAll.Visible = rbAll.Checked;
             gbSingleLine.Visible = !rbAll.Checked;
         }
@@ -241,7 +261,7 @@ namespace Upload
             switch (m_SingleLineState) 
             { 
                 case eSingleLineState.BEGIN:
-                    OpenSerialPort();
+                    OpenSerialPort(eUploadMethod.SINGLE_LINE);
                     tBoxTimeout.Enabled = false;
                     lblStatus.Text = "Upload in progress...";
                     m_Timeout = Convert.ToUInt64(tBoxTimeout.Text);
@@ -311,13 +331,10 @@ namespace Upload
             sp.Close();
         }
 
-        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
-        {
-            Properties.Settings.Default.AckTimeout = Convert.ToUInt64(tBoxTimeout.Text);
-            Properties.Settings.Default.MostRecentFile = lblFileSelected.Text;
-            Properties.Settings.Default.Save();
-        }
 
+        /// <summary>
+        /// Single line at a time thread
+        /// </summary>
         private void WorkerSendSingle()
         {
             bool success = false; 
