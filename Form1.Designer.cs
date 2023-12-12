@@ -350,7 +350,7 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Margin = new System.Windows.Forms.Padding(8, 7, 8, 7);
             this.Name = "Form1";
-            this.Text = "Target Drilliling Upload/Download CSV (v1.0)";
+            this.Text = "Target Drilliling Upload/Download CSV (v1.1)";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.gbUpDownSelect.ResumeLayout(false);
             this.gbUpDownSelect.PerformLayout();

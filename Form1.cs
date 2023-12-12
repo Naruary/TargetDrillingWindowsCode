@@ -320,6 +320,7 @@ namespace Upload
             btnDownloadSave.Enabled = false;
             btnDownloadAbort.Enabled = false;
             gbUpDownSelect.Enabled = true;
+            lblStatus.Text = "Download Aborted!";
             sp.Close();
         }
 
