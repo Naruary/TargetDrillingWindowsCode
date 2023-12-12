@@ -51,7 +51,7 @@
     <StartupObject />
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>TargetDrilling.ico</ApplicationIcon>
+    <ApplicationIcon>TargetDrilling1.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -103,6 +103,7 @@
   <ItemGroup>
     <Content Include="helpme.ico" />
     <Content Include="TargetDrilling.ico" />
+    <Content Include="TargetDrilling1.ico" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.8">

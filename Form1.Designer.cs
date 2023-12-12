@@ -44,6 +44,7 @@
             this.rbUpload = new System.Windows.Forms.RadioButton();
             this.gbUpload = new System.Windows.Forms.GroupBox();
             this.gbDownload = new System.Windows.Forms.GroupBox();
+            this.btnDownloadAbort = new System.Windows.Forms.Button();
             this.btnDownloadStart = new System.Windows.Forms.Button();
             this.btnDownloadSave = new System.Windows.Forms.Button();
             this.tBoxTimeout = new System.Windows.Forms.TextBox();
@@ -52,7 +53,6 @@
             this.tbSerialLog = new System.Windows.Forms.TextBox();
             this.label6 = new System.Windows.Forms.Label();
             this.btnClearLog = new System.Windows.Forms.Button();
-            this.btnDownloadAbort = new System.Windows.Forms.Button();
             this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
             this.gbUploadOptions = new System.Windows.Forms.GroupBox();
             this.gbUpDownSelect.SuspendLayout();
@@ -221,6 +221,18 @@
             this.gbDownload.TabStop = false;
             this.gbDownload.Text = "Download";
             // 
+            // btnDownloadAbort
+            // 
+            this.btnDownloadAbort.Enabled = false;
+            this.btnDownloadAbort.Location = new System.Drawing.Point(42, 175);
+            this.btnDownloadAbort.Margin = new System.Windows.Forms.Padding(8, 7, 8, 7);
+            this.btnDownloadAbort.Name = "btnDownloadAbort";
+            this.btnDownloadAbort.Size = new System.Drawing.Size(176, 51);
+            this.btnDownloadAbort.TabIndex = 7;
+            this.btnDownloadAbort.Text = "Abort";
+            this.btnDownloadAbort.UseVisualStyleBackColor = true;
+            this.btnDownloadAbort.Click += new System.EventHandler(this.btnDownloadAbort_Click);
+            // 
             // btnDownloadStart
             // 
             this.btnDownloadStart.Location = new System.Drawing.Point(42, 53);
@@ -302,18 +314,6 @@
             this.btnClearLog.Text = "Clear Log";
             this.btnClearLog.UseVisualStyleBackColor = true;
             this.btnClearLog.Click += new System.EventHandler(this.btnClearLog_Click);
-            // 
-            // btnDownloadAbort
-            // 
-            this.btnDownloadAbort.Enabled = false;
-            this.btnDownloadAbort.Location = new System.Drawing.Point(42, 175);
-            this.btnDownloadAbort.Margin = new System.Windows.Forms.Padding(8, 7, 8, 7);
-            this.btnDownloadAbort.Name = "btnDownloadAbort";
-            this.btnDownloadAbort.Size = new System.Drawing.Size(176, 51);
-            this.btnDownloadAbort.TabIndex = 7;
-            this.btnDownloadAbort.Text = "Abort";
-            this.btnDownloadAbort.UseVisualStyleBackColor = true;
-            this.btnDownloadAbort.Click += new System.EventHandler(this.btnDownloadAbort_Click);
             // 
             // gbUploadOptions
             // 
