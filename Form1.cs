@@ -65,6 +65,8 @@ namespace Upload
             if (comboBoxSerialPort.Items.Count > 0) 
             {
                 comboBoxSerialPort.SelectedIndex = 0;
+                btnDownloadStart.Enabled = true;
+                btnUploadStart.Enabled = true;
             }
         }
 

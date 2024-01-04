@@ -113,6 +113,7 @@
             // 
             // btnUploadStart
             // 
+            this.btnUploadStart.Enabled = false;
             this.btnUploadStart.Location = new System.Drawing.Point(42, 53);
             this.btnUploadStart.Margin = new System.Windows.Forms.Padding(8, 7, 8, 7);
             this.btnUploadStart.Name = "btnUploadStart";
@@ -235,6 +236,7 @@
             // 
             // btnDownloadStart
             // 
+            this.btnDownloadStart.Enabled = false;
             this.btnDownloadStart.Location = new System.Drawing.Point(42, 53);
             this.btnDownloadStart.Margin = new System.Windows.Forms.Padding(8, 7, 8, 7);
             this.btnDownloadStart.Name = "btnDownloadStart";
@@ -350,7 +352,7 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Margin = new System.Windows.Forms.Padding(8, 7, 8, 7);
             this.Name = "Form1";
-            this.Text = "Target Drilliling Upload/Download CSV (v1.1)";
+            this.Text = "Target Drilliling Upload/Download CSV (v1.2)";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.gbUpDownSelect.ResumeLayout(false);
             this.gbUpDownSelect.PerformLayout();
