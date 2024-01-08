@@ -9,7 +9,7 @@
       <Value Profile="(Default)">1000</Value>
     </Setting>
     <Setting Name="MostRecentFile" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">No File</Value>
     </Setting>
   </Settings>
 </SettingsFile>
